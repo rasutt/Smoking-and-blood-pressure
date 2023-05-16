@@ -1,13 +1,15 @@
 ---
-title: "Biostats interview question"
+title: "Effect of smoking on high-blood pressure"
 author: "Robin Aldridge-Sutton"
 date: "`r Sys.Date()`"
-output: html_document
+output: github_document
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
+
+The data in the following table was obtained from a study on smoking and high blood  pressure. The researcher wants to know whether people who smoke are more likely to have  high blood pressure.
 
 ```{r}
 # Gender, male as reference
