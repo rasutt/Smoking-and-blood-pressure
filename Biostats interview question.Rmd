@@ -1,0 +1,56 @@
+---
+title: "Biostats interview question"
+author: "Robin Aldridge-Sutton"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+# Gender, male as reference
+g = rep(0:1, each = 12)
+
+# Age group, using 20-24 as reference age group
+ag = rbind(0, diag(5), 0, diag(5))[rep(1:12, each = 2), ]
+colnames(ag) = paste0(c(35, 50, 60, 70, 80), "-")
+
+# Smoking
+s = rep(0:1, 12)
+
+# High-blood pressure
+hbp = cbind(c(6, 4, 18, 22, 30, 55, 22, 13, 12, 14, 10, 8, 
+              2, 9, 12, 18, 28, 22, 24, 32, 22, 41, 11, 4),
+            c(18, 11, 28, 17, 22, 44, 30, 52, 32, 26, 22, 5,
+              14, 12, 27, 11, 40, 37, 38, 28, 39, 35, 19, 6))
+colnames(hbp) = c("yes", "no")
+cbind(g, ag, s, hbp)
+```
+```{r}
+# Fit binomial regression model with all interactions
+brmais = glm(hbp ~ ag * g * s, family = binomial)
+summary(brmais)
+```
+When all interactions between smoking and the other predictor variables are included there are no statistically significant effects of smoking, so remove the second-order interactions and check each of the first-order interactions.
+
+```{r}
+# Fit binomial regression model with interaction between smoking and age-group
+brmisag = glm(hbp ~ g + ag * s, family = binomial)
+summary(brmisag)
+```
+The interaction between smoking and age-group not statistically significant.
+
+```{r}
+# Fit binomial regression model with interaction between smoking and gender
+brmisg = glm(hbp ~ ag + g * s, family = binomial)
+summary(brmisg)
+```
+```{r}
+# Standard error, log-odds ratio, and confidence interval
+se = sqrt(0.18225^2 + 0.25558^2)
+lor = 0.08771 + 0.50865
+exp(lor + c(-1, 0, 1) * 1.96 * se)
+```
+The interaction between gender and smoking is statistically significant, p = 0.047. The effect of smoking for males is not statistically significant, p = 0.63. For females the odds of high blood-pressure are estimate to be 1.8 times higher for smokers than non-smokers, but this is not quite statistically significant (95% confidence interval 0.98, 3.36).
